@@ -41,6 +41,7 @@ def generate_config(url: str, llm_mode_str: str) -> dict:
         
     parts = llm_mode_str.split(":", 1)
     if len(parts) > 1:
+        # Expected format: "api:gemini/gemini-1.5-flash", "api:anthropic/claude-3-haiku-20240307", "local:ollama/llama3"
         model_name = parts[1]
     else:
         model_name = "gpt-3.5-turbo" # Default
@@ -60,15 +61,26 @@ Output ONLY a valid JSON object with the following schema:
     user_prompt = f"Analyze this HTML snippet and generate the JSON config for {url}:\n\n```html\n{skeleton_html}\n```"
 
     try:
+        # Some models (like older Anthropic/Gemini versions) might not support native JSON mode response_format.
+        # We pass it conditionally or just let the prompt do the work.
+        optional_params = {}
+        if "openai" in model_name.lower() or "ollama" in model_name.lower() or "gemini" in model_name.lower():
+             optional_params["response_format"] = {"type": "json_object"}
+        
         response = litellm.completion(
             model=model_name,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            response_format={"type": "json_object"}
+            **optional_params
         )
         content = response.choices[0].message.content
+        
+        # Clean potential markdown wrapping from non-json-mode models
+        if content.startswith("```json"):
+            content = content.replace("```json\n", "").replace("\n```", "")
+        
         config = json.loads(content)
         
         # Save to configs/

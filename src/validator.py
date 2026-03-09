@@ -58,15 +58,23 @@ Output ONLY a JSON object with the following schema:
     user_prompt = f"Evaluate these Markdown API scraps:\n\n{sample_texts}"
 
     try:
+        optional_params = {}
+        if "openai" in model_name.lower() or "ollama" in model_name.lower() or "gemini" in model_name.lower():
+             optional_params["response_format"] = {"type": "json_object"}
+
         response = litellm.completion(
             model=model_name,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            response_format={"type": "json_object"}
+            **optional_params
         )
         content = response.choices[0].message.content
+        
+        if content.startswith("```json"):
+            content = content.replace("```json\n", "").replace("\n```", "")
+            
         report = json.loads(content)
         
         # Save Report

@@ -44,7 +44,19 @@ python main.py https://docs.example.com/api --llm local:ollama/llama3.2
 Builds the `./rag_db` vector database automatically after successfully pulling the documents.
 ```bash
 export OPENAI_API_KEY="sk-..."
-python main.py https://docs.example.com/api --llm api:openai:gpt-4o --rag
+python main.py https://docs.example.com/api --llm api:openai/gpt-4o --rag
+```
+
+### 4. Using Google Gemini
+```bash
+export GEMINI_API_KEY="AIzaSy..."
+python main.py https://docs.example.com/api --llm api:gemini/gemini-1.5-flash
+```
+
+### 5. Using Anthropic Claude
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+python main.py https://docs.example.com/api --llm api:anthropic/claude-3-haiku-20240307
 ```
 
 ## 📁 Project Structure
