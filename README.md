@@ -1,5 +1,7 @@
 # API Document Collector 🤖
 
+**English** | [한국어](README_ko.md)
+
 A generalized pipeline that automatically crawls an API documentation website, parses its structure using an LLM, extracts clean Markdown content, and optionally builds a local RAG Vector Database for agent-based pipelines.
 
 ## ⭐ Features
